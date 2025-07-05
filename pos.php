@@ -42,7 +42,7 @@ if(isset($_SESSION['admin']) AND !empty($_SESSION['admin'])){
           <input type="text" id="barcode" placeholder="Search products using barcode" minlength="13" maxlength="13">
           <!-- <a href="dashboard" type="button" class="btn btn-primary ml-2" onclick="removeAllItems()"><i class="fa fa-home"></i> Home</a> -->
 
-          <a href="logout" type="button" class="btn btn-danger rounded-circle ml-2" title="Logout" onclick="removeAllItems()"><i class="fa fa-sign-out-alt"></i></a>
+          <button type="button" class="btn btn-danger rounded-circle ml-2" title="Logout" onclick="attemptLogout()"><i class="fa fa-sign-out-alt"></i></button>
         </div>
 
         <div class="category-tabs">
@@ -498,29 +498,6 @@ if(isset($_SESSION['admin']) AND !empty($_SESSION['admin'])){
           });
         }
 
-        const removeAllItems = () => {
-
-          let remove_all = "remove_all";
-
-          $.ajax({
-            url:'insertToCart.php',
-            dataType: 'json',
-            type: 'POST',
-            data:{
-              remove_all: remove_all
-            },
-            success:function(response) {
-              if(response.success) {
-                console.log("Remove All Item Response:", response.success); 
-                $('#subtotal').text('00.00');
-                $('#amount_paid').val('');
-                $('#barcode').val('');
-                return confirm('Are you sure you want to log out?');
-              }
-            }
-          });
-        }
-
         const fetchCart = () => {
           $.ajax({
             url: 'fetchCart.php',
@@ -563,6 +540,31 @@ if(isset($_SESSION['admin']) AND !empty($_SESSION['admin'])){
               console.error("Error: " + textStatus, errorThrown); 
             }
           });
+        }
+
+        function attemptLogout() {
+          const logout = "logout";
+          $.ajax({
+              url:'insertToCart.php',
+              type: 'POST',
+              dataType: 'json',
+              data:{
+                logout: logout
+              },
+              success:function(response) {
+                if(response.success) {
+                  console.log(response.message);
+                  window.location.href = 'logout';
+                }else {
+                  showMessage("Logout Failed", response.message, "error");
+                }
+              },
+              error: function(xhr, status, error) {
+                if(status === "parsererror"){
+                  console.error("Error: ", xhr.responseText); 
+                }      
+              }
+            });
         }
 
         function showMessage(title, text, icon) {

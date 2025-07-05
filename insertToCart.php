@@ -149,11 +149,26 @@
         unset($_SESSION["cart_item"]);
     }
 
+    # logout items
+    if(isset($_POST['logout'])){
+        if(isset($_SESSION['cart_item']) && count($_SESSION['cart_item']) > 0){
+
+            foreach($_SESSION['cart_item'] as $k => $v) {
+                $product->addToStock($v['product_id'],$v['quantity']);   
+            }
+
+            $success = true;
+            $message = "Logout Successful";
+            unset($_SESSION["cart_item"]);
+        }
+    }
+
     $response = [
         'success' => $success,
         'message' => $message,
     ];
 
+    
     echo json_encode($response);
     exit();
     
